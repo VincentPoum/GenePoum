@@ -1,0 +1,8 @@
+{% extends "genepoum/base.html" %}
+{% block content %}
+    <h1>Naissance</h1>
+    <form method="POST" class="NaissanceView">{% csrf_token %}
+        {{ form.as_l }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
+{% endblock %}

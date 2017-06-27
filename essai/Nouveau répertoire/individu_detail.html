@@ -1,0 +1,99 @@
+{% extends "genepoum/base.html" %}
+{% block extrastyle %}
+<link href="/static/css/individu_detail.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+
+<!-- Les grands-parents -->
+
+<ul class="rig columns-4">
+	<li>
+		{% if individu.individu_pere.individu_pere %}
+			<a href="/genepoum/individu/{{ individu.individu_pere.individu_pere.id }}/">{{individu.individu_pere.individu_pere}}</a> 
+		{% else %}
+			inconnu
+		{% endif %}
+	</li>
+	<li>
+		{% if individu.individu_pere.individu_mere %}
+			<a href="/genepoum/individu/{{ individu.individu_pere.individu_mere.id }}/">{{individu.individu_pere.individu_mere}}</a>
+		{% else %}
+			inconnue
+		{% endif %}	
+	</li>
+	<li>
+		{% if individu.individu_mere.individu_pere %}
+			<a href="/genepoum/individu/{{ individu.individu_mere.individu_pere.id }}/">{{individu.individu_mere.individu_pere}}</a> 
+		{% else %}
+			inconnu
+		{% endif %}
+	</li>
+	<li>
+		{% if individu.individu_mere.individu_mere %}
+			<a href="/genepoum/individu/{{ individu.individu_mere.individu_mere.id }}/">{{individu.individu_mere.individu_mere}}</a>
+		{% else %}
+			inconnue
+		{% endif %}	
+	</li>
+</ul>	
+
+
+<!-- Les parents -->
+	
+<ul class="rig columns-2">
+	<li>
+		{% if individu.individu_pere %}
+			<a href="/genepoum/individu/{{ individu.individu_pere.id }}/">{{individu.individu_pere}}</a> 
+		{% else %}
+			inconnu
+		{% endif %}
+	</li>
+	<li>
+		{% if individu.individu_mere %}
+			<a href="/genepoum/individu/{{ individu.individu_mere.id }}/">{{individu.individu_mere}}</a>
+		{% else %}
+			inconnue
+		{% endif %}	
+	</li>
+</ul>	
+
+<!-- Lui ou elle et le ou la conjoint(e) -->
+	
+	<ul class="rig column-1" >
+		<li>
+		   <p>{{individu.individu_prenom_usage}}  {{individu.individu_nom}} né(e) le {{individu.naissance}}</p>
+		</li>
+		
+	{% if mariage_list %}
+        {% for participant in mariage_list %}
+            <li>
+	            <p> marié(e) le {{ participant.0 }} avec <a href="/genepoum/individu/{{ participant|last }}/" >{{ participant.1 }} {{ participant.2 }} </a></p>
+	         </li>
+        {% endfor %}
+	{% else %}
+				<li><p>resté célibataire !</p>
+					{% if enfants_list %}
+						<p>mais il ou elle a des enfants !</p>
+					{% endif %}
+				</li>
+	{% endif %}
+   </ul>
+    
+<!-- Les enfants -->	
+
+	<ul class="rig columns-3">
+		{% if enfants_list %}
+        {% for enfant in enfants_list %}
+            <li> <a href="/genepoum/individu/{{ enfant.id }}/" > {{ enfant.individu_prenom_usage }}</a> né(e) {{ enfant.naissance }}</li>
+        {% endfor %}
+		{% else %}
+			<li>Pas d'enfant connu</li>
+		{% endif %}
+    </ul>
+    
+	
+	<p></p>
+	<p>ses évènements :</p>
+	{{ individu.ses_evenements }}
+	
+{% endblock %}

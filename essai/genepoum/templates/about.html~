@@ -1,0 +1,6 @@
+{% extends "genepoum/base.html" %}
+{% block content %}
+<h1>
+<a href="/genepoum/individus" >Liste de individus</a>
+</h1>
+{% endblock %}

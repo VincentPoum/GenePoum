@@ -1,0 +1,95 @@
+
+
+>>> from genepoum.models import Event,Individu,Event_Qui
+
+>>> Event.objects.all()
+<QuerySet [<Event: N1808-11-17T22:10:13+00:00>, <Event: M1805-11-19T17:41:02+00:00>, <Event: D1822-03-26T18:03:23+00:00>, <Event: N1806-10-02T18:18:51+00:00>, <Event: N1812-03-20T22:10:13+00:00>, <Event: N1815-06-12T19:01:15+00:00>, <Event: N1818-12-15T01:00:00+00:00>]>
+>>> Event.event_qui_set.all()
+Traceback (most recent call last):
+  File "<console>", line 1, in <module>
+AttributeError: 'ReverseManyToOneDescriptor' object has no attribute 'all'
+>>> e=Event.objects.get(pk=1)
+>>> e
+<Event: N1808-11-17T22:10:13+00:00>
+>>> e.event_qui_set.all()
+<QuerySet [<Event_Qui: N>, <Event_Qui: N>, <Event_Qui: N>]>
+>>> Event.objects.values()
+<QuerySet [{'event_date': datetime.datetime(1808, 11, 17, 22, 10, 13, tzinfo=<UTC>), 'event_comment': u'Naissance de Pierre Poumerol', u'id': 1, 'event_type': u'N'}, {'event_date': datetime.datetime(1805, 11, 19, 17, 41, 2, tzinfo=<UTC>), 'event_comment': u'', u'id': 2, 'event_type': u'M'}, {'event_date': datetime.datetime(1822, 3, 26, 18, 3, 23, tzinfo=<UTC>), 'event_comment': u'', u'id': 3, 'event_type': u'D'}, {'event_date': datetime.datetime(1806, 10, 2, 18, 18, 51, tzinfo=<UTC>), 'event_comment': u'', u'id': 4, 'event_type': u'N'}, {'event_date': datetime.datetime(1812, 3, 20, 22, 10, 13, tzinfo=<UTC>), 'event_comment': u'', u'id': 5, 'event_type': u'N'}, {'event_date': datetime.datetime(1815, 6, 12, 19, 1, 15, tzinfo=<UTC>), 'event_comment': u'', u'id': 6, 'event_type': u'N'}, {'event_date': datetime.datetime(1818, 12, 15, 1, 0, tzinfo=<UTC>), 'event_comment': u'', u'id': 7, 'event_type': u'N'}]>
+>>> e.event_qui_set.values()
+<QuerySet [{u'event_qui_individu_id': 1, 'event_qui_fonction': u'fils', 'event_qui_comment': u'', u'id': 1, u'event_qui_event_id': 1}, {u'event_qui_individu_id': 5, 'event_qui_fonction': u'pere', 'event_qui_comment': u'', u'id': 2, u'event_qui_event_id': 1}, {u'event_qui_individu_id': 10, 'event_qui_fonction': u'mere', 'event_qui_comment': u'', u'id': 12, u'event_qui_event_id': 1}]>
+>>> e.event_qui_set.values_list()
+<QuerySet [(1, 1, 1, u'fils', u''), (2, 1, 5, u'pere', u''), (12, 1, 10, u'mere', u'')]>
+>>> e.event_qui_set.values_list('event_qui_individu')
+<QuerySet [(1,), (5,), (10,)]>
+
+
+>>> e.event_qui_set.values_list('event_qui_individu__individu_nom','event_qui_individu__individu_prenom_usage')
+<QuerySet [(u'Poumerol', u'Pierre'), (u'Poumerol', u'Antoine-Pascal'), (u'Bussi\xe8res', u'Anne')]>
+>>> i=Individu.objects.get(pk=1)
+>>> i
+<Individu: Poumerol Pierre>
+>>> self.individu_nom
+Traceback (most recent call last):
+  File "<console>", line 1, in <module>
+NameError: name 'self' is not defined
+>>> i.event_qui_set.all()
+<QuerySet [<Event_Qui: N>]>
+>>> i.event_qui_set.values()
+<QuerySet [{u'event_qui_individu_id': 1, 'event_qui_fonction': u'fils', 'event_qui_comment': u'', u'id': 1, u'event_qui_event_id': 1}]>
+>>> i.event_qui_set.values_list()
+<QuerySet [(1, 1, 1, u'fils', u'')]>
+>>> i.event_qui_set.values_list('event_qui_event')
+<QuerySet [(1,)]>
+
+
+>>> i.event_qui_set.values_list('event_qui_event__event_type')
+<QuerySet [(u'N',)]>
+>>> i.event_qui_set.values_list('event_qui_event__event_type','event_qui_event__event_date')
+<QuerySet [(u'N', datetime.datetime(1808, 11, 17, 22, 10, 13, tzinfo=<UTC>))]>
+>>> i
+<Individu: Poumerol Pierre>
+
+---------------------------------------------------------------------------------------
+
+>>> from genepoum.models import Individu, Event, Event_Qui
+>>> i=Individu.objects.get(pk=5)
+
+
+>>> i.ses_evenements()
+<QuerySet [(u'pere', u'N', datetime.datetime(1808, 11, 17, 22, 10, 13, tzinfo=<UTC>)), (u'mari\xe9', u'M', datetime.datetime(1805, 11, 19, 17, 41, 2, tzinfo=<UTC>)), (u'mari', u'D', datetime.datetime(1822, 3, 26, 18, 3, 23, tzinfo=<UTC>)), (u'pere', u'N', datetime.datetime(1806, 10, 2, 18, 18, 51, tzinfo=<UTC>)), (u'pere', u'N', datetime.datetime(1812, 3, 20, 22, 10, 13, tzinfo=<UTC>)), (u'pere', u'N', datetime.datetime(1815, 6, 12, 19, 1, 15, tzinfo=<UTC>)), (u'pere', u'N', datetime.datetime(1818, 12, 15, 1, 0, tzinfo=<UTC>))]>
+>>> e=i.ses_evenements()
+>>> e
+<QuerySet [(u'pere', u'N', datetime.datetime(1808, 11, 17, 22, 10, 13, tzinfo=<UTC>)), (u'mari\xe9', u'M', datetime.datetime(1805, 11, 19, 17, 41, 2, tzinfo=<UTC>)), (u'mari', u'D', datetime.datetime(1822, 3, 26, 18, 3, 23, tzinfo=<UTC>)), (u'pere', u'N', datetime.datetime(1806, 10, 2, 18, 18, 51, tzinfo=<UTC>)), (u'pere', u'N', datetime.datetime(1812, 3, 20, 22, 10, 13, tzinfo=<UTC>)), (u'pere', u'N', datetime.datetime(1815, 6, 12, 19, 1, 15, tzinfo=<UTC>)), (u'pere', u'N', datetime.datetime(1818, 12, 15, 1, 0, tzinfo=<UTC>))]>
+
+
+>>> e.datetimes('event_qui_event__event_date','day')
+<QuerySet [datetime.datetime(1805, 11, 19, 0, 0, tzinfo=<UTC>), datetime.datetime(1806, 10, 2, 0, 0, tzinfo=<UTC>), datetime.datetime(1808, 11, 17, 0, 0, tzinfo=<UTC>), datetime.datetime(1812, 3, 20, 0, 0, tzinfo=<UTC>), datetime.datetime(1815, 6, 12, 0, 0, tzinfo=<UTC>), datetime.datetime(1818, 12, 15, 0, 0, tzinfo=<UTC>), datetime.datetime(1822, 3, 26, 0, 0, tzinfo=<UTC>)]>
+>>> e.filter(event_qui_event__event_type__contains='E').datetimes('event_qui_event__event_date','day')
+<QuerySet [datetime.datetime(1806, 10, 2, 0, 0, tzinfo=<UTC>), datetime.datetime(1808, 11, 17, 0, 0, tzinfo=<UTC>), datetime.datetime(1812, 3, 20, 0, 0, tzinfo=<UTC>), datetime.datetime(1815, 6, 12, 0, 0, tzinfo=<UTC>), datetime.datetime(1818, 12, 15, 0, 0, tzinfo=<UTC>)]>
+
+
+>>> e.filter(event_qui_event__event_type__contains='N').datetimes('event_qui_event__event_date','day')
+<QuerySet []>
+>>> naiss=e.filter(event_qui_event__event_type__contains='N').datetimes('event_qui_event__event_date','day')
+>>> naiss
+<QuerySet []>
+
+
+>>> enfants = e.filter(event_qui_event__event_type__contains='E').datetimes('event_qui_event__event_date','day')
+>>> enfants
+<QuerySet [datetime.datetime(1806, 10, 2, 0, 0, tzinfo=<UTC>), datetime.datetime(1808, 11, 17, 0, 0, tzinfo=<UTC>), datetime.datetime(1812, 3, 20, 0, 0, tzinfo=<UTC>), datetime.datetime(1815, 6, 12, 0, 0, tzinfo=<UTC>), datetime.datetime(1818, 12, 15, 0, 0, tzinfo=<UTC>)]>
+
+
+>>> enfants.values('event_qui_individu__individu_prenom_usage')
+<QuerySet [{'event_qui_individu__individu_prenom_usage': u'Antoine-Pascal'}, {'event_qui_individu__individu_prenom_usage': u'Antoine-Pascal'}, {'event_qui_individu__individu_prenom_usage': u'Antoine-Pascal'}, {'event_qui_individu__individu_prenom_usage': u'Antoine-Pascal'}, {'event_qui_individu__individu_prenom_usage': u'Antoine-Pascal'}]>
+
+
+>>> e.filter(event_qui_event__event_type__contains='E')
+<QuerySet [(u'pere', u'E', datetime.datetime(1808, 11, 17, 22, 10, 13, tzinfo=<UTC>)), (u'pere', u'E', datetime.datetime(1806, 10, 2, 18, 18, 51, tzinfo=<UTC>)), (u'pere', u'E', datetime.datetime(1812, 3, 20, 22, 10, 13, tzinfo=<UTC>)), (u'pere', u'E', datetime.datetime(1815, 6, 12, 19, 1, 15, tzinfo=<UTC>)), (u'pere', u'E', datetime.datetime(1818, 12, 15, 1, 0, tzinfo=<UTC>))]>
+>>> enfants = e.filter(event_qui_event__event_type__contains='E')
+
+
+>>> Individu.objects.filter(individu_pere=5)
+<QuerySet [<Individu: Poumerol Pierre>, <Individu: Poumerol Gabriel>, <Individu: Poumerol Gilberte>, <Individu: Poumerol Marie>, <Individu: Poumerol Julie>]>
+>>> 
+
