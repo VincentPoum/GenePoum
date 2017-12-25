@@ -6,13 +6,15 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import ListView, DetailView, CreateView
-from django.forms import ModelForm
+from django.forms import ModelForm, modelformset_factory
+
 
 # Create your views here.
 
 from django.http import HttpResponse
 
 from genepoum.models import *
+from genepoum.forms import *
 
 
 def index(request):
@@ -63,7 +65,38 @@ class IndividuDetail(DetailView):
 		return context
 
 
-class NaissanceView(CreateView):
-    model = Individu
-    template_name = 'naissance.html'
-    fields = ['individu_sexe','individu_nom','individu_prenom_usage','individu_pere','individu_mere','event_qui__event_qui_fonction']
+class Naissance(DetailView):
+	model = Individu
+	template_name = "naissance_form.html"
+	def get_context_data(self, **kwargs):
+		context = super(Naissance, self).get_context_data(**kwargs)
+		le_sexe = context['object'].individu_sexe
+		print '-Naissance-',le_sexe
+		return context
+		
+
+def essai_naissance(request, pk):
+	NEFormSet = modelformset_factory(Event, form = NaissanceEventForm, extra = 0)
+	NIFormSet = modelformset_factory(Individu, form = NaissanceIndividuForm, extra = 0)
+	if request.method == 'POST':
+		neformset = NEFormSet(request.POST)
+		niformset = NIFormSet(request.POST)
+		if neformset.is_valid() and niformset.is_valid() :
+			# do something with the formset.cleaned_data
+			print 'Essai-Naissance post'
+			pass
+	else:
+		qs = Individu.objects.filter(id=pk)
+		personne = Individu.objects.get(id=pk)
+		la_personne = personne.individu_prenom_usage+' '+personne.individu_nom
+#		qs_naissance = personne.event_qui_set.filter(event_qui_fonction__contains='BEBE').values_list('event_qui_event__event_date','event_qui_event__event_type')
+		id_naissance = personne.event_qui_set.filter(event_qui_fonction__contains='BEBE').values_list('event_qui_event__id')
+		qs_naissance = Event.objects.filter(id=id_naissance)
+		niformset = NIFormSet(queryset=qs)
+		neformset = NEFormSet(queryset=qs_naissance)
+		print '>>>>>>>',qs,qs_naissance
+		print niformset
+		print neformset
+
+	return render(request, 'naissance_form.html', {'neformset': neformset , 'niformset': niformset, 'la_personne':la_personne})
+	
